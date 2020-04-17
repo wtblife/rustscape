@@ -1,0 +1,282 @@
+#![enable(implicit_some)]
+Prefab (
+    entities: [
+        (
+            data: (
+                light: (
+                    ambient_color: (Srgba(0.5, 0.5, 0.5, 0.5)),
+                    light: Directional((
+                        color: Srgb(1.0, 0.95, 0.68),
+                        intensity: 0.9,
+                        direction: [-1, -1, -1.0],
+                    )),
+                ),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("mesh/terrain/TerrainTest1.glb", ()),
+                terrain_tag: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("mesh/creatures/Male_Shirt.glb", ()),
+                transform: (
+                    translation: (2.0, 0.0, 2.0),
+                    // rotation: (0.5, -0.5, -0.5, 0.5),
+                ),
+                animation: (
+                    idle_index: 0,
+                    run_index: 2,
+                    attack_index: 4,
+                    pickup_index: 1
+                ),
+                movement: (
+                    movement_speed: 10.0,
+                    path: []
+                ),
+            ),
+        ),
+        // (
+        //     parent: 2,
+        //     data: (
+        //         transform: (
+        //             translation: (0.0, 3.0, 0.0),
+        //         ),
+        //     )
+        // ),
+        (
+            data: (
+                transform: (
+                    rotation: (0, 0.5, 0.2, 0),
+                ),
+                camera: Perspective(
+                    aspect: 1.3,
+                    fovy: 1.0471975512,
+                    znear: 0.1,
+                    zfar: 2000.0,
+                ),
+                auto_fov: (
+                    base_fovx: 1.361356817,
+                    base_aspect_ratio: (13, 10),
+                ),
+                control_tag: (arc_ball: (2, 20.),),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("mesh/nature/CommonTree_1.glb", ()),
+                transform: (
+                    translation: (-16.0, 0.0, 6.0),
+                    scale: (4, 4, 4),
+                ),
+                interactable: (),
+                obstacle: (),
+                bounding_mesh: () //mesh data for interaction and avoidance
+            ),
+        ),
+        (
+            data: (
+                gltf: File("mesh/nature/CommonTree_4.glb", ()),
+                transform: (
+                    translation: (-10.0, 0.0, 0.0),
+                    scale: (4, 4, 4),
+                ),
+                interactable: (),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("mesh/nature/Plant_1.glb", ()),
+                transform: (
+                    translation: (10.0, 0.0, 0.0),
+                    scale: (1.5, 1.5, 1.5),
+                ),
+                interactable: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("mesh/creatures/Spider.glb", ()),
+                transform: (
+                    translation: (-10.0, 0.0, 4.0),
+                    rotation: (0.0, 1, 0.0, 0.0),
+                ),
+                animation: (
+                    idle_index: 1,
+                    run_index: 3,
+                    attack_index: 0,
+                ),
+                movement: (
+                    movement_speed: 4.0,
+                    path: []
+                ),
+                attackable: (),
+                hostile: () //will attack if in range
+            ),
+        ),
+                (
+            data: (
+                gltf: File("mesh/creatures/Spider.glb", ()),
+                transform: (
+                    translation: (-20.0, 0.0, 0.0),
+                    rotation: (0.0, 1, 0.0, 0.0),
+                ),
+                animation: (
+                    idle_index: 1,
+                    run_index: 3,
+                    attack_index: 0,
+                ),
+                movement: (
+                    movement_speed: 4.0,
+                    path: []
+                ),
+                attackable: (),
+                hostile: () //will attack if in range
+            ),
+        ),
+        (
+            data: (
+                gltf: File("mesh/creatures/Rat.glb", ()),
+                transform: (
+                    translation: (2, 0.0, 15.0),
+                    rotation: (0.0, 2, 0.0, 0.0),
+                ),
+                animation: (
+                    idle_index: 1,
+                    run_index: 3,
+                    attack_index: 2,
+                ),
+                movement: (
+                    movement_speed: 3.0,
+                    path: []
+                ),
+                attackable: ()
+            ),
+        ),
+        (
+            data: (
+                gltf: File("mesh/buildings/LargeSquareTower.glb", ()),
+                transform: (
+                    translation: (39, 0.0, -30.0),
+                    scale: (8, 8, 8),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("mesh/buildings/TallWall.glb", ()),
+                transform: (
+                    translation: (30.0, -0.2, -30.0),
+                    scale: (10, 10, 10),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("mesh/buildings/TallWall.glb", ()),
+                transform: (
+                    translation: (15.0, -0.2, -30.0),
+                    scale: (10, 10, 10),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("mesh/buildings/TallWallEntrance.glb", ()),
+                transform: (
+                    translation: (0.0, 0.0, -30.0),
+                    scale: (10, 10, 10),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("mesh/buildings/Bridge.glb", ()),
+                transform: (
+                    translation: (0.0, 0.0, -30.0),
+                    scale: (10, 10, 10),
+                ),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("mesh/buildings/TallWall.glb", ()),
+                transform: (
+                    translation: (-15, -0.15, -30.0),
+                    scale: (10, 10, 10),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("mesh/buildings/TallWall.glb", ()),
+                transform: (
+                    translation: (-30, -0.15, -30.0),
+                    scale: (10, 10, 10),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("mesh/buildings/LargeSquareTower.glb", ()),
+                transform: (
+                    translation: (-39, 0.0, -30.0),
+                    scale: (8, 8, 8),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("mesh/buildings/Dummy.glb", ()),
+                transform: (
+                    translation: (-12, 0.0, -40.0),
+                    scale: (4, 4, 4),
+                    rotation: (0.0, 1.0, 0.0, 0.0),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("mesh/buildings/Target.glb", ()),
+                transform: (
+                    translation: (-20, 0.0, -40.0),
+                    scale: (4, 4, 4),
+                    rotation: (0.0, 1.0, 0.0, 0.0),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("mesh/buildings/TargetWithArrows.glb", ()),
+                transform: (
+                    translation: (-23, 0.0, -40.0),
+                    scale: (4, 4, 4),
+                    rotation: (0.0, 1.0, 0.0, 0.0),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("mesh/buildings/Well.glb", ()),
+                transform: (
+                    translation: (0.0, 0.0, -70.0),
+                    scale: (7, 7, 7),
+                ),
+                obstacle: (),
+            ),
+        ),
+    ],
+)

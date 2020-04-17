@@ -1,0 +1,122 @@
+{
+    "asset" : {
+        "generator" : "Khronos glTF Blender I/O v1.2.57",
+        "version" : "2.0"
+    },
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "Scene",
+            "nodes" : [
+                0
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "mesh" : 0,
+            "name" : "Grid"
+        }
+    ],
+    "materials" : [
+        {
+            "doubleSided" : true,
+            "emissiveFactor" : [
+                0,
+                0,
+                0
+            ],
+            "name" : "Material.001",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.0928853452205658,
+                    0.8000000715255737,
+                    0.03782327100634575,
+                    1
+                ],
+                "metallicFactor" : 0,
+                "roughnessFactor" : 0.5
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "Grid",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 0,
+                        "NORMAL" : 1,
+                        "TEXCOORD_0" : 2
+                    },
+                    "indices" : 3,
+                    "material" : 0
+                }
+            ]
+        }
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5126,
+            "count" : 23,
+            "max" : [
+                25,
+                0,
+                25
+            ],
+            "min" : [
+                -25,
+                0,
+                -25
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 23,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 23,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5123,
+            "count" : 54,
+            "type" : "SCALAR"
+        }
+    ],
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 276,
+            "byteOffset" : 0
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 276,
+            "byteOffset" : 276
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 184,
+            "byteOffset" : 552
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 108,
+            "byteOffset" : 736
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 844,
+            "uri" : "data:application/octet-stream;base64,VVUFwQAAAAAAAMhBAADIwQAAAABVVQVBAADIwQAAAAAAAMhBVlUFQQAAAAAAAMhBVVUFwQAAAABVVQVBAADIQQAAAAAAAMhBVlUFQQAAAABVVQVBAADIwQAAAABWVQXBVlUFQQAAAABVVQVBVVUFwQAAAABWVQXBAADIQQAAAABVVQVBVlUFQQAAAABWVQXBVVUFwQAAAABWVQXBAADIwQAAAAAAAMjBAADIwQAAAABWVQXBVlUFQQAAAABWVQXBVVUFwQAAAAAAAMjBAADIQQAAAABWVQXBVlUFQQAAAAAAAMjBVlUFQQAAAABWVQXBAADIQQAAAABWVQXBVlUFQQAAAAAAAMjBAADIQQAAAAAAAMjBAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAq6qqPgAAgD8AAAAAqqoqPwAAAAAAAIA/q6oqPwAAgD+rqqo+qqoqPwAAgD8AAIA/qqoqP6qqKj8AAAAAqqqqPquqKj+qqio/q6qqPqqqqj4AAIA/qqoqP6qqKj+qqqo+q6qqPqyqqj4AAAAAAAAAAAAAAACsqqo+q6oqP6yqqj6rqqo+AAAAAAAAgD+sqqo+qqoqPwAAAACrqio/qqqqPgAAgD+qqqo+q6oqPwAAAAAAAIA/AAAAAAAAAQACAAMABAAAAAUABgADAAQABwABAAgACQAEAAoACwAIAAwADQAOAA8AEAAMABEAEgAPAAAABAABAAMACAAEAAUACgAGAAQACQAHAAgAEwAJAAoAFAALAAwAEAANAA8AFQAQABEAFgASAA=="
+        }
+    ]
+}
