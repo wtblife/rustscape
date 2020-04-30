@@ -1,0 +1,37 @@
+#![enable(implicit_some)]
+Prefab (
+    entities: [
+        (
+            data: (
+                gltf: File("models/nature/CommonTree_1.glb", ()),
+                transform: (
+                    translation: (-16.0, 0.0, 6.0),
+                    scale: (4, 4, 4),
+                ),
+                interactable: (),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("models/nature/CommonTree_4.glb", ()),
+                transform: (
+                    translation: (-10.0, 0.0, 0.0),
+                    scale: (4, 4, 4),
+                ),
+                interactable: (),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("models/nature/Plant_1.glb", ()),
+                transform: (
+                    translation: (10.0, 0.0, 0.0),
+                    scale: (1.5, 1.5, 1.5),
+                ),
+                interactable: (),
+            ),
+        ),
+    ]
+)

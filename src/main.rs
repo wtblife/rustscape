@@ -79,7 +79,7 @@ const ATTACK_INTERVAL: f32 = 1.5;
 const CAMERA_SENSITIVITY_X: f32 = 0.1;
 const CAMERA_SENSITIVITY_Y: f32 = 0.1;
 const CAMERA_MIN_DISTANCE: f32 = 9.0;
-const CAMERA_MAX_DISTANCE: f32 = 30.0;
+const CAMERA_MAX_DISTANCE: f32 = 35.0;
 const CURRENT_PLAYER: u32 = 2;
 const CHUNK_SIZE: u32 = 100;
 
@@ -87,7 +87,7 @@ use std::path::PathBuf;
 fn main() -> Result<(), Error> {
     amethyst::start_logger(Default::default());
 
-    let app_dir = PathBuf::from(r"D:/playing with rust/rustscape"); //application_root_dir().unwrap();
+    let app_dir = application_root_dir().unwrap(); //PathBuf::from(r"C:/Documents/Rust Projects/rustscape"); 
     let display_config_path = app_dir.join("config/display.ron");
     let assets_dir = app_dir.join("assets/");
 
@@ -132,21 +132,21 @@ fn main() -> Result<(), Error> {
             InteractionSystemDesc::default(),
             "interaction_system",
             &[
-                "transform_system",
-                "input_system",
-                "camera_distance_system",
-                "animation_control",
-                "sampler_interpolation",
+                // "transform_system",
+                // "input_system",
+                // "camera_distance_system",
+                // "animation_control",
+                // "sampler_interpolation",
             ],
         )
         .with_system_desc(
             MovementSystemDesc::default(),
             "movement_system",
             &[
-                "transform_system",
-                "camera_distance_system",
-                "animation_control",
-                "sampler_interpolation",
+                // "transform_system",
+                // "camera_distance_system",
+                // "animation_control",
+                // "sampler_interpolation",
             ],
         )
         .with_system_desc(
@@ -158,9 +158,9 @@ fn main() -> Result<(), Error> {
             AttackSystemDesc::default(),
             "attack_system",
             &[
-                "transform_system",
-                "animation_control",
-                "sampler_interpolation",
+                // "transform_system",
+                // "animation_control",
+                // "sampler_interpolation",
             ],
         )
         .with_bundle(UiBundle::<StringBindings>::new())?
@@ -197,11 +197,11 @@ struct ScenePrefabData {
     attackable: Option<Tag<AttackableTag>>,
     interactable: Option<Tag<InteractableTag>>,
     obstacle: Option<Tag<ObstacleTag>>,
-    terrain_tag: Option<Tag<TerrainTag>>,
+    current_player: Option<Tag<CurrentPlayerTag>>,
 }
 
 fn load_nav_mesh(world: &mut World, gltf_path: &str) {
-    let mut debug = DebugLinesComponent::default();
+    // let mut debug = DebugLinesComponent::default();
 
     let (gltf, buffers, _) = gltf::import(gltf_path).unwrap();
     for mesh in gltf.meshes() {
@@ -210,11 +210,10 @@ fn load_nav_mesh(world: &mut World, gltf_path: &str) {
         println!("Mesh #{}", mesh.index());
         for primitive in mesh.primitives() {
             println!("- Primitive #{}", primitive.index());
-
             let reader = primitive.reader(|buffer| Some(&buffers[buffer.index()]));
 
             use gltf::mesh::util::ReadIndices;
-            let mut indices: Vec<u32> = match reader.read_indices() {
+            let indices: Vec<u32> = match reader.read_indices() {
                 Some(ReadIndices::U8(iter)) => iter.map(u32::from).collect(),
 
                 Some(ReadIndices::U16(iter)) => iter.map(u32::from).collect(),
@@ -276,14 +275,14 @@ fn load_nav_mesh(world: &mut World, gltf_path: &str) {
 
 struct Loading {
     progress: ProgressCounter,
-    scene: Option<Handle<Prefab<ScenePrefabData>>>,
+    scene: Vec<Handle<Prefab<ScenePrefabData>>>,
 }
 
 impl Loading {
     fn new() -> Self {
         Loading {
             progress: ProgressCounter::new(),
-            scene: None,
+            scene: vec![],
         }
     }
 }
@@ -294,15 +293,26 @@ impl SimpleState for Loading {
             creator.create("ui/loading.ron", &mut self.progress);
         });
 
-        let handle = data
-            .world
-            .exec(|loader: PrefabLoader<'_, ScenePrefabData>| {
-                loader.load("prefab/scene_prefab.ron", RonFormat, &mut self.progress)
-            });
+        let prefabs_to_load: Vec<String> = vec![
+            "world/scene_prefab.ron".into(),
+            "world/nature/nature.ron".into(),
+            "world/buildings/buildings.ron".into(),
+        ];
+
+        let mut handles = vec![];
+        for prefab in prefabs_to_load.iter() {
+            handles.push(
+                data.world
+                    .exec(|loader: PrefabLoader<'_, ScenePrefabData>| {
+                        loader.load(prefab, RonFormat, &mut self.progress)
+                    }),
+            );
+        }
 
         data.world.insert(NavMeshesRes::default());
-        load_nav_mesh(data.world, "assets/mesh/terrain/TerrainTest1.glb");
-        self.scene = Some(handle);
+        load_nav_mesh(data.world, "assets/models/terrain/TerrainTest1.glb");
+
+        self.scene = handles;
     }
 
     fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
@@ -314,8 +324,9 @@ impl SimpleState for Loading {
             }
             Completion::Complete => {
                 info!("Loading finished. Moving to the main state.");
+
                 Trans::Switch(Box::new(MyScene {
-                    scene: self.scene.take().unwrap(),
+                    scene: self.scene.clone(),
                 }))
             }
         }
@@ -323,12 +334,16 @@ impl SimpleState for Loading {
 }
 
 struct MyScene {
-    scene: Handle<Prefab<ScenePrefabData>>,
+    scene: Vec<Handle<Prefab<ScenePrefabData>>>,
 }
 
 impl SimpleState for MyScene {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        data.world.create_entity().with(self.scene.clone()).build();
+        for scene in self.scene.iter() {
+            // let mut scene = self.scene.iter();
+            data.world.create_entity().with(scene.clone()).build();
+        }
+
         data.world
             .exec(|finder: UiFinder| finder.find("loading"))
             .map_or_else(
@@ -445,7 +460,7 @@ impl<'a> System<'a> for InteractionSystem {
         ReadStorage<'a, Tag<InteractableTag>>,
         Read<'a, NavMeshesRes>,
         Read<'a, Visibility>,
-        ReadStorage<'a, Tag<TerrainTag>>,
+        ReadStorage<'a, Tag<CurrentPlayerTag>>,
     );
 
     fn run(
@@ -466,7 +481,7 @@ impl<'a> System<'a> for InteractionSystem {
             interactables,
             nav_meshes,
             visibility,
-            terrain_tags,
+            current_players,
         ): Self::SystemData,
     ) {
         for event in input_events.read(&mut self.event_reader) {
@@ -495,18 +510,21 @@ impl<'a> System<'a> for InteractionSystem {
                                 let mut found_attackable = false;
                                 let mut entity_id: Option<u32> = None;
                                 let mut closest_distance = u32::max_value();
+                                let mut current_player: Option<u32> = None;
                                 for (
                                     bounding_sphere,
                                     transform,
                                     entity,
                                     attackable,
                                     interactable,
+                                    current_player_tag,
                                 ) in (
                                     &bounding_spheres,
                                     &transforms,
                                     &entities,
                                     (&attackables).maybe(),
                                     (&interactables).maybe(),
+                                    (&current_players).maybe(),
                                 )
                                     .join()
                                 {
@@ -514,7 +532,7 @@ impl<'a> System<'a> for InteractionSystem {
                                         visibility.visible_unordered.contains(entity.id());
                                     let attackable = attackable.is_some();
                                     let interactable = interactable.is_some();
-                                    if entity.id() != CURRENT_PLAYER
+                                    if current_player_tag.is_none()
                                         && (interactable || attackable)
                                         && visible
                                     {
@@ -535,93 +553,96 @@ impl<'a> System<'a> for InteractionSystem {
                                                 entity_id = Some(entity.id());
                                             }
                                         }
+                                    } else if current_player_tag.is_some() {
+                                        current_player = Some(entity.id());
                                     }
                                 }
 
-                                if let Some(entity_id) = entity_id {
-                                    if found_attackable {
-                                        attack_events.single_write(AttackEvent::new(
-                                            CURRENT_PLAYER,
-                                            entity_id,
-                                            false,
-                                        ));
-                                    } else if found_interactable {
-                                    }
-                                } else {
-                                    if let Some(position) = transforms
-                                        .get(entities.entity(2))
-                                        .and_then(|transform| Some(transform.translation()))
-                                    {
-                                        //test each mesh that is loaded
-                                        for nav_mesh in nav_meshes.meshes_iter() {
-                                            //TODO: clean this up, figure out how to map properly
-                                            let mut vertices = vec![];
-                                            for vertex in nav_mesh.vertices() {
-                                                vertices.push(Point3::new(
-                                                    vertex.x, vertex.y, vertex.z,
-                                                ));
-                                            }
-                                            let mut indices = vec![];
-                                            for triangle in nav_mesh.triangles() {
-                                                indices.push(Point3::new(
-                                                    triangle.first as usize,
-                                                    triangle.second as usize,
-                                                    triangle.third as usize,
-                                                ));
-                                            }
-                                            let terrain_mesh =
-                                                TriMesh::new(vertices, indices, None);
-                                            let terrain_isometry = Isometry3::from_parts(
-                                                Translation3::new(
-                                                    nav_mesh.origin().x,
-                                                    nav_mesh.origin().y,
-                                                    nav_mesh.origin().z,
-                                                ),
-                                                *Transform::default().rotation(),
-                                            );
-                                            if let Some(toi) = terrain_mesh.toi_with_ray(
-                                                &terrain_isometry,
-                                                &ncollide_ray,
-                                                true,
-                                            ) {
-                                                let mouse_world_position =
-                                                    ncollide_ray.point_at(toi);
+                                if let Some(current_player) = current_player {
+                                    if let Some(entity_id) = entity_id {
+                                        if found_attackable {
+                                            attack_events.single_write(AttackEvent::new(
+                                                CURRENT_PLAYER,
+                                                entity_id,
+                                                false,
+                                            ));
+                                        } else if found_interactable {
+                                        }
+                                    } else {
+                                        if let Some(position) = transforms
+                                            .get(entities.entity(2))
+                                            .and_then(|transform| Some(transform.translation()))
+                                        {
+                                            //test each mesh that is loaded
+                                            for nav_mesh in nav_meshes.meshes_iter() {
+                                                //TODO: clean this up, figure out how to map properly
+                                                let mut vertices = vec![];
+                                                for vertex in nav_mesh.vertices() {
+                                                    vertices.push(Point3::new(
+                                                        vertex.x, vertex.y, vertex.z,
+                                                    ));
+                                                }
+                                                let mut indices = vec![];
+                                                for triangle in nav_mesh.triangles() {
+                                                    indices.push(Point3::new(
+                                                        triangle.first as usize,
+                                                        triangle.second as usize,
+                                                        triangle.third as usize,
+                                                    ));
+                                                }
+                                                let terrain_mesh =
+                                                    TriMesh::new(vertices, indices, None);
+                                                let terrain_isometry = Isometry3::from_parts(
+                                                    Translation3::new(
+                                                        nav_mesh.origin().x,
+                                                        nav_mesh.origin().y,
+                                                        nav_mesh.origin().z,
+                                                    ),
+                                                    *Transform::default().rotation(),
+                                                );
+                                                if let Some(toi) = terrain_mesh.toi_with_ray(
+                                                    &terrain_isometry,
+                                                    &ncollide_ray,
+                                                    true,
+                                                ) {
+                                                    let mouse_world_position =
+                                                        ncollide_ray.point_at(toi);
 
-                                                let distance = (position
-                                                    - Vector3::new(
-                                                        mouse_world_position.x,
-                                                        mouse_world_position.y,
-                                                        mouse_world_position.z,
-                                                    ))
-                                                .magnitude();
-                                                //maybe only have the rest of the pathfinding logic on backend
-                                                if distance >= 1.0 {
-                                                    if let Some(closest_nav_mesh) = nav_meshes
-                                                        .closest_point(
-                                                            (
-                                                                mouse_world_position.x,
-                                                                mouse_world_position.y,
-                                                                mouse_world_position.z,
-                                                            )
-                                                                .into(),
-                                                            NavQuery::Accuracy,
-                                                        )
-                                                    {
-                                                        if let Some(path) = nav_meshes
-                                                            .find_mesh(closest_nav_mesh.0)
-                                                            .and_then(|mesh| {
-                                                                mesh.find_path(
-                                                                    (
-                                                                        position.x, position.y,
-                                                                        position.z,
-                                                                    )
-                                                                        .into(),
-                                                                    closest_nav_mesh.1,
-                                                                    NavQuery::Accuracy,
-                                                                    NavPathMode::Accuracy,
+                                                    let distance = (position
+                                                        - Vector3::new(
+                                                            mouse_world_position.x,
+                                                            mouse_world_position.y,
+                                                            mouse_world_position.z,
+                                                        ))
+                                                    .magnitude();
+                                                    //maybe only have the rest of the pathfinding logic on backend
+                                                    if distance >= 1.0 {
+                                                        if let Some(closest_nav_mesh) = nav_meshes
+                                                            .closest_point(
+                                                                (
+                                                                    mouse_world_position.x,
+                                                                    mouse_world_position.y,
+                                                                    mouse_world_position.z,
                                                                 )
-                                                                .and_then(|path| {
-                                                                    Some(
+                                                                    .into(),
+                                                                NavQuery::Accuracy,
+                                                            )
+                                                        {
+                                                            if let Some(path) = nav_meshes
+                                                                .find_mesh(closest_nav_mesh.0)
+                                                                .and_then(|mesh| {
+                                                                    mesh.find_path(
+                                                                        (
+                                                                            position.x, position.y,
+                                                                            position.z,
+                                                                        )
+                                                                            .into(),
+                                                                        closest_nav_mesh.1,
+                                                                        NavQuery::Accuracy,
+                                                                        NavPathMode::Accuracy,
+                                                                    )
+                                                                    .and_then(|path| {
+                                                                        Some(
                                                                             path[1..]
                                                                                 .iter()
                                                                                 .map(|vec| {
@@ -636,22 +657,26 @@ impl<'a> System<'a> for InteractionSystem {
                                                                                 >>(
                                                                                 ),
                                                                         )
+                                                                    })
                                                                 })
-                                                            })
-                                                        {
-                                                            movement_events.single_write(
-                                                                MovementEvent::new(2, path),
-                                                            );
+                                                            {
+                                                                movement_events.single_write(
+                                                                    MovementEvent::new(
+                                                                        current_player,
+                                                                        path,
+                                                                    ),
+                                                                );
+                                                            } else {
+                                                                error!("Failed to find path to ({}, {}, {}) for nav mesh {}", closest_nav_mesh.1.x, closest_nav_mesh.1.y, closest_nav_mesh.1.z, closest_nav_mesh.0.to_string());
+                                                            }
                                                         } else {
-                                                            error!("Failed to find path to ({}, {}, {}) for nav mesh {}", closest_nav_mesh.1.x, closest_nav_mesh.1.y, closest_nav_mesh.1.z, closest_nav_mesh.0.to_string());
+                                                            error!("Failed to find nav mesh for point ({}, {}, {})", mouse_world_position.x, mouse_world_position.y, mouse_world_position.z)
                                                         }
-                                                    } else {
-                                                        error!("Failed to find nav mesh for point ({}, {}, {})", mouse_world_position.x, mouse_world_position.y, mouse_world_position.z)
                                                     }
-                                                }
 
-                                                //stop if intersection was found
-                                                break;
+                                                    //stop if intersection was found
+                                                    break;
+                                                }
                                             }
                                         }
                                     }
@@ -677,6 +702,9 @@ struct InteractableTag;
 
 #[derive(Clone, Serialize, Deserialize)]
 struct AttackableTag;
+
+#[derive(Clone, Serialize, Deserialize)]
+struct CurrentPlayerTag;
 
 #[derive(Clone, Serialize, Deserialize, PrefabData)]
 #[prefab(Component)]

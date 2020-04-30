@@ -1,0 +1,17 @@
+#![enable(implicit_some)]
+Prefab (
+    entities: [
+        (
+            data: (
+                light: (
+                    ambient_color: (Srgba(0.5, 0.5, 0.5, 0.5)),
+                    light: Directional((
+                        color: Srgb(1.0, 0.95, 0.68),
+                        intensity: 0.9,
+                        direction: [-1, -1, -1.0],
+                    )),
+                ),
+            ),
+        ),
+    ]
+)

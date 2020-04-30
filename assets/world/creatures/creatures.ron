@@ -1,0 +1,64 @@
+#![enable(implicit_some)]
+Prefab (
+    entities: [
+        (
+            data: (
+                gltf: File("models/creatures/Spider.glb", ()),
+                transform: (
+                    translation: (-10.0, 0.0, 4.0),
+                    rotation: (0.0, 1, 0.0, 0.0),
+                ),
+                animation: (
+                    idle_index: 1,
+                    run_index: 3,
+                    attack_index: 0,
+                ),
+                movement: (
+                    movement_speed: 4.0,
+                    path: []
+                ),
+                attackable: (),
+                hostile: () //will attack if in range
+            ),
+        ),
+        (
+            data: (
+                gltf: File("models/creatures/Spider.glb", ()),
+                transform: (
+                    translation: (-20.0, 0.0, 0.0),
+                    rotation: (0.0, 1, 0.0, 0.0),
+                ),
+                animation: (
+                    idle_index: 1,
+                    run_index: 3,
+                    attack_index: 0,
+                ),
+                movement: (
+                    movement_speed: 4.0,
+                    path: []
+                ),
+                attackable: (),
+                hostile: () //will attack if in range
+            ),
+        ),
+        (
+            data: (
+                gltf: File("models/creatures/Rat.glb", ()),
+                transform: (
+                    translation: (2, 0.0, 15.0),
+                    rotation: (0.0, 2, 0.0, 0.0),
+                ),
+                animation: (
+                    idle_index: 1,
+                    run_index: 3,
+                    attack_index: 2,
+                ),
+                movement: (
+                    movement_speed: 3.0,
+                    path: []
+                ),
+                attackable: ()
+            ),
+        ),
+    ]
+)

@@ -1,0 +1,127 @@
+#![enable(implicit_some)]
+Prefab (
+    entities: [
+        (
+            data: (
+                gltf: File("models/buildings/LargeSquareTower.glb", ()),
+                transform: (
+                    translation: (39, 0.0, -30.0),
+                    scale: (8, 8, 8),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("models/buildings/TallWall.glb", ()),
+                transform: (
+                    translation: (30.0, -0.2, -30.0),
+                    scale: (10, 10, 10),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("models/buildings/TallWall.glb", ()),
+                transform: (
+                    translation: (15.0, -0.2, -30.0),
+                    scale: (10, 10, 10),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("models/buildings/TallWallEntrance.glb", ()),
+                transform: (
+                    translation: (0.0, 0.0, -30.0),
+                    scale: (10, 10, 10),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("models/buildings/Bridge.glb", ()),
+                transform: (
+                    translation: (0.0, 0.0, -30.0),
+                    scale: (10, 10, 10),
+                ),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("models/buildings/TallWall.glb", ()),
+                transform: (
+                    translation: (-15, -0.15, -30.0),
+                    scale: (10, 10, 10),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("models/buildings/TallWall.glb", ()),
+                transform: (
+                    translation: (-30, -0.15, -30.0),
+                    scale: (10, 10, 10),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("models/buildings/LargeSquareTower.glb", ()),
+                transform: (
+                    translation: (-39, 0.0, -30.0),
+                    scale: (8, 8, 8),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("models/buildings/Dummy.glb", ()),
+                transform: (
+                    translation: (-12, 0.0, -40.0),
+                    scale: (4, 4, 4),
+                    rotation: (0.0, 1.0, 0.0, 0.0),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("models/buildings/Target.glb", ()),
+                transform: (
+                    translation: (-20, 0.0, -40.0),
+                    scale: (4, 4, 4),
+                    rotation: (0.0, 1.0, 0.0, 0.0),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("models/buildings/TargetWithArrows.glb", ()),
+                transform: (
+                    translation: (-23, 0.0, -40.0),
+                    scale: (4, 4, 4),
+                    rotation: (0.0, 1.0, 0.0, 0.0),
+                ),
+                obstacle: (),
+            ),
+        ),
+        (
+            data: (
+                gltf: File("models/buildings/Well.glb", ()),
+                transform: (
+                    translation: (0.0, 0.0, -70.0),
+                    scale: (7, 7, 7),
+                ),
+                obstacle: (),
+            ),
+        ),
+    ]
+)
