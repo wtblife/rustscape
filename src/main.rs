@@ -44,6 +44,7 @@ use amethyst::{
         visibility::{BoundingSphere, Frustum, Visibility},
         RenderingBundle,
     },
+    shred::FetchMut,
     ui::{RenderUi, UiBundle, UiCreator, UiFinder, UiText},
     utils::{
         application_root_dir,
@@ -80,14 +81,12 @@ const CAMERA_SENSITIVITY_X: f32 = 0.1;
 const CAMERA_SENSITIVITY_Y: f32 = 0.1;
 const CAMERA_MIN_DISTANCE: f32 = 9.0;
 const CAMERA_MAX_DISTANCE: f32 = 35.0;
-const CURRENT_PLAYER: u32 = 2;
-const CHUNK_SIZE: u32 = 100;
 
 use std::path::PathBuf;
 fn main() -> Result<(), Error> {
     amethyst::start_logger(Default::default());
 
-    let app_dir = application_root_dir().unwrap(); //PathBuf::from(r"C:/Documents/Rust Projects/rustscape"); 
+    let app_dir = /*application_root_dir().unwrap();*/ PathBuf::from(r"C:/Users/wtbli/Documents/Rust Projects/rustscape");
     let display_config_path = app_dir.join("config/display.ron");
     let assets_dir = app_dir.join("assets/");
 
@@ -200,8 +199,8 @@ struct ScenePrefabData {
     current_player: Option<Tag<CurrentPlayerTag>>,
 }
 
-fn load_nav_mesh(world: &mut World, gltf_path: &str) {
-    // let mut debug = DebugLinesComponent::default();
+fn load_nav_meshes(world: &mut World, gltf_path: &str) {
+    let mut all_nav_meshes_res = world.write_resource::<AllNavMeshes>();
 
     let (gltf, buffers, _) = gltf::import(gltf_path).unwrap();
     for mesh in gltf.meshes() {
@@ -237,40 +236,55 @@ fn load_nav_mesh(world: &mut World, gltf_path: &str) {
                 }
             }
         }
+        all_nav_meshes_res
+            .nav_meshes
+            .push(NavMesh::new(vertices, triangles).unwrap());
+    }
+}
 
-        // for triangle in &triangles {
-        //     let f = vertices[triangle.first as usize];
-        //     let s = vertices[triangle.second as usize];
-        //     let t = vertices[triangle.third as usize];
-        //     debug.add_line(
-        //         [f.x as f32, f.y as f32, f.z as f32].into(),
-        //         [s.x as f32, s.y as f32, s.z as f32].into(),
-        //         Srgba::new(0.0, 0.0, 0.0, 1.0),
-        //     );
-        //     debug.add_line(
-        //         [s.x as f32, s.y as f32, s.z as f32].into(),
-        //         [t.x as f32, t.y as f32, t.z as f32].into(),
-        //         Srgba::new(0.0, 0.0, 0.0, 1.0),
-        //     );
-        //     debug.add_line(
-        //         [t.x as f32, t.y as f32, t.z as f32].into(),
-        //         [f.x as f32, f.y as f32, f.z as f32].into(),
-        //         Srgba::new(0.0, 0.0, 0.0, 1.0),
-        //     );
-        // }
+fn load_active_nav_meshes(
+    all_nav_meshes: &Vec<NavMesh>,
+    active_nav_meshes_res: &mut FetchMut<NavMeshesRes>,
+    radius: f32,
+    center: Vector2<f32>,
+) -> DebugLinesComponent {
+    let mut debug = DebugLinesComponent::default();
 
-        let mesh = NavMesh::new(vertices, triangles).unwrap();
-        world.write_resource::<NavMeshesRes>().register(mesh);
+    for nav_mesh in all_nav_meshes {
+        let origin = Vector2::new(nav_mesh.origin().x, nav_mesh.origin().z);
+
+        if (origin - center).magnitude() <= radius {
+            let vertices = nav_mesh.vertices();
+            for triangle in nav_mesh.triangles() {
+                let f = vertices[triangle.first as usize];
+                let s = vertices[triangle.second as usize];
+                let t = vertices[triangle.third as usize];
+                debug.add_line(
+                    [f.x as f32, f.y as f32, f.z as f32].into(),
+                    [s.x as f32, s.y as f32, s.z as f32].into(),
+                    Srgba::new(0.0, 0.0, 0.0, 1.0),
+                );
+                debug.add_line(
+                    [s.x as f32, s.y as f32, s.z as f32].into(),
+                    [t.x as f32, t.y as f32, t.z as f32].into(),
+                    Srgba::new(0.0, 0.0, 0.0, 1.0),
+                );
+                debug.add_line(
+                    [t.x as f32, t.y as f32, t.z as f32].into(),
+                    [f.x as f32, f.y as f32, f.z as f32].into(),
+                    Srgba::new(0.0, 0.0, 0.0, 1.0),
+                );
+            }
+            active_nav_meshes_res.register(nav_mesh.clone());
+        }
     }
 
-    // println!("{:?}", triangles);
-    // println!("{:?}", vertices);
+    debug
+}
 
-    // world
-    //     .create_entity()
-    //     .with(Transform::default())
-    //     .with(debug)
-    //     .build();
+#[derive(Default)]
+struct AllNavMeshes {
+    pub nav_meshes: Vec<NavMesh>,
 }
 
 struct Loading {
@@ -297,6 +311,7 @@ impl SimpleState for Loading {
             "world/scene_prefab.ron".into(),
             "world/nature/nature.ron".into(),
             "world/buildings/buildings.ron".into(),
+            "world/creatures/creatures.ron".into(),
         ];
 
         let mut handles = vec![];
@@ -310,7 +325,20 @@ impl SimpleState for Loading {
         }
 
         data.world.insert(NavMeshesRes::default());
-        load_nav_mesh(data.world, "assets/models/terrain/TerrainTest1.glb");
+        data.world.insert(AllNavMeshes::default());
+        load_nav_meshes(data.world, "assets/models/terrain/dissected_terrain.glb");
+        let debug = load_active_nav_meshes(
+            &data.world.read_resource::<AllNavMeshes>().nav_meshes,
+            &mut data.world.write_resource::<NavMeshesRes>(),
+            100.0,
+            Vector2::new(0.0, 0.0),
+        );
+
+        data.world
+            .create_entity()
+            .with(Transform::default())
+            .with(debug)
+            .build();
 
         self.scene = handles;
     }
@@ -562,7 +590,7 @@ impl<'a> System<'a> for InteractionSystem {
                                     if let Some(entity_id) = entity_id {
                                         if found_attackable {
                                             attack_events.single_write(AttackEvent::new(
-                                                CURRENT_PLAYER,
+                                                current_player,
                                                 entity_id,
                                                 false,
                                             ));
@@ -570,12 +598,13 @@ impl<'a> System<'a> for InteractionSystem {
                                         }
                                     } else {
                                         if let Some(position) = transforms
-                                            .get(entities.entity(2))
+                                            .get(entities.entity(current_player))
                                             .and_then(|transform| Some(transform.translation()))
                                         {
                                             //test each mesh that is loaded
+                                            //TODO: only test nav_meshes in camera frustrum
                                             for nav_mesh in nav_meshes.meshes_iter() {
-                                                //TODO: clean this up, figure out how to map properly
+                                                //TODO: clean this up, figure out how to map properly and optimize
                                                 let mut vertices = vec![];
                                                 for vertex in nav_mesh.vertices() {
                                                     vertices.push(Point3::new(
@@ -593,11 +622,7 @@ impl<'a> System<'a> for InteractionSystem {
                                                 let terrain_mesh =
                                                     TriMesh::new(vertices, indices, None);
                                                 let terrain_isometry = Isometry3::from_parts(
-                                                    Translation3::new(
-                                                        nav_mesh.origin().x,
-                                                        nav_mesh.origin().y,
-                                                        nav_mesh.origin().z,
-                                                    ),
+                                                    Translation3::new(0.0, 0.0, 0.0),
                                                     *Transform::default().rotation(),
                                                 );
                                                 if let Some(toi) = terrain_mesh.toi_with_ray(

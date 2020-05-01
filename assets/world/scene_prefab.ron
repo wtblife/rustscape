@@ -15,7 +15,7 @@ Prefab (
         ),
         (
             data: (
-                gltf: File("models/terrain/TerrainTest1.glb", ()),
+                gltf: File("models/terrain/dissected_terrain.glb", ()),
                 terrain_tag: (),
             ),
         ),
@@ -23,7 +23,7 @@ Prefab (
             data: (
                 gltf: File("models/creatures/Male_Shirt.glb", ()),
                 transform: (
-                    translation: (2.0, 0.0, 2.0),
+                    translation: (-200.0, 0.0, -200.0),
                     // rotation: (0.5, -0.5, -0.5, 0.5),
                 ),
                 animation: (
